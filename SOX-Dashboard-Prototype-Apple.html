@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Solution SOX Review</title>
+<style>
+  :root{
+    --bg:#F5F5F7; --card:#FFFFFF; --ink:#1D1D1F; --sub:#6E6E73; --hair:#E8E8ED;
+    --blue:#0071E3; --blue-d:#0060C2; --green:#34C759; --orange:#FF9500; --red:#FF3B30;
+    --purple:#AF52DE; --teal:#30B0C7; --gray:#8E8E93;
+    --r:18px; --shadow:0 4px 24px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+    font-size:15px;line-height:1.47;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer}
+
+  /* ===== nav ===== */
+  .nav{position:sticky;top:0;z-index:5;backdrop-filter:saturate(180%) blur(20px);
+    background:rgba(255,255,255,.72);border-bottom:1px solid rgba(0,0,0,.07);
+    display:flex;align-items:center;justify-content:space-between;padding:12px 28px}
+  .nav .brand{font-size:17px;font-weight:600;letter-spacing:-.01em}
+  .nav .brand span{color:var(--sub);font-weight:400}
+  .pillbtn{border:none;border-radius:980px;padding:8px 18px;font-size:14px;font-weight:500;
+    background:var(--blue);color:#fff;transition:background .15s}
+  .pillbtn:hover{background:var(--blue-d)}
+  .pillbtn.quiet{background:rgba(0,0,0,.05);color:var(--ink)}
+  .pillbtn.quiet:hover{background:rgba(0,0,0,.09)}
+  .pillbtn:disabled{background:rgba(0,0,0,.05);color:#AEAEB2;cursor:default}
+
+  .shell{max-width:1440px;margin:0 auto;padding:28px}
+  .headline{font-size:34px;font-weight:700;letter-spacing:-.022em;margin:4px 0 2px}
+  .subline{color:var(--sub);font-size:17px;margin:0 0 24px}
+
+  /* ===== stat strip ===== */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+  .stat{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 20px}
+  .stat .n{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.05}
+  .stat .l{color:var(--sub);font-size:13px;margin-top:3px}
+  .stat.red .n{color:var(--red)} .stat.blue .n{color:var(--blue)} .stat.green .n{color:var(--green)}
+
+  /* ===== layout ===== */
+  .grid{display:grid;grid-template-columns:minmax(320px,400px) 1fr;gap:22px;align-items:start}
+  .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow)}
+  .card h2{font-size:19px;font-weight:600;letter-spacing:-.015em;margin:0;padding:18px 22px 12px}
+
+  /* ===== donut ===== */
+  .donutwrap{display:flex;gap:26px;align-items:center;padding:6px 22px 22px;flex-wrap:wrap}
+  .donutcenter{font-size:26px;font-weight:700}
+  .legend{display:grid;gap:8px;font-size:14px;flex:1;min-width:180px}
+  .legend .li{display:flex;align-items:center;gap:10px;color:var(--sub)}
+  .legend .li strong{color:var(--ink);margin-left:auto}
+  .legend .dot{width:10px;height:10px;border-radius:50%;flex:none}
+
+  /* ===== journey ===== */
+  .journey{display:flex;align-items:center;gap:0;padding:8px 22px 22px;overflow-x:auto}
+  .jstep{display:flex;align-items:center;gap:0;flex:1;min-width:0}
+  .jdot{width:26px;height:26px;border-radius:50%;background:var(--hair);color:var(--sub);
+    display:grid;place-items:center;font-size:12px;font-weight:600;flex:none;transition:all .2s}
+  .jlbl{font-size:12px;color:var(--sub);margin-left:8px;white-space:nowrap}
+  .jline{height:2px;background:var(--hair);flex:1;margin:0 10px;min-width:14px}
+  .jstep.done .jdot{background:var(--ink);color:#fff}
+  .jstep.on .jdot{background:var(--blue);color:#fff;box-shadow:0 0 0 5px rgba(0,113,227,.15)}
+  .jstep.on .jlbl{color:var(--ink);font-weight:600}
+  .jstep.done .jline{background:var(--ink)}
+
+  /* ===== list ===== */
+  .seg{display:flex;background:rgba(0,0,0,.05);border-radius:10px;padding:2px;margin:0 22px 12px;width:fit-content}
+  .seg button{border:none;background:transparent;border-radius:8px;padding:5px 14px;font-size:13px;color:var(--sub)}
+  .seg button.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  .list{max-height:60vh;overflow-y:auto;padding:0 10px 12px}
+  .row{display:grid;gap:3px;padding:13px 12px;border-radius:12px;cursor:pointer;transition:background .12s}
+  .row:hover{background:rgba(0,0,0,.03)}
+  .row.sel{background:rgba(0,113,227,.08)}
+  .row .t{font-weight:600;font-size:15px;letter-spacing:-.01em}
+  .row .m{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub)}
+  .row .due{margin-left:auto}
+  .row .due.over{color:var(--red);font-weight:600}
+  .badge{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:980px;white-space:nowrap}
+  .b-intake{background:rgba(0,113,227,.12);color:var(--blue)}
+  .b-triage{background:rgba(255,149,0,.14);color:#B36A00}
+  .b-valid{background:rgba(48,176,199,.14);color:#1B7A8C}
+  .b-review{background:rgba(175,82,222,.13);color:#8A2BBF}
+  .b-concl{background:rgba(52,199,89,.14);color:#1E8A3C}
+  .b-closed{background:rgba(142,142,147,.14);color:var(--gray)}
+
+  /* ===== detail ===== */
+  .detail .head{padding:20px 24px 14px;border-bottom:1px solid var(--hair)}
+  .detail .head h3{font-size:23px;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
+  .detail .head p{margin:0;color:var(--sub);font-size:15px;max-width:70ch}
+  .detail .headrow{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .detail .body{padding:8px 24px 20px;max-height:52vh;overflow-y:auto}
+  .sect{padding:16px 0 4px}
+  .sect h4{font-size:13px;font-weight:600;color:var(--sub);margin:0 0 10px;letter-spacing:.01em}
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px 22px}
+  .f label{display:block;font-size:12px;color:var(--sub);margin-bottom:1px}
+  .f .v{font-size:14.5px}
+  .f .v.long{grid-column:1/-1}
+  .f.wide{grid-column:1/-1}
+  .yes{color:var(--red);font-weight:600}.no{color:var(--green);font-weight:600}.tbd{color:var(--orange);font-weight:600}
+  .actionsbar{display:flex;gap:10px;padding:14px 24px;border-top:1px solid var(--hair);flex-wrap:wrap;align-items:center}
+  .empty{padding:70px 24px;color:var(--sub);text-align:center;font-size:16px}
+
+  /* ===== sheets (modals) ===== */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);display:none;align-items:flex-end;justify-content:center;z-index:20}
+  .overlay.open{display:flex}
+  @media(min-width:700px){.overlay.open{align-items:center}}
+  .sheet{background:#fff;width:min(480px,100vw);border-radius:22px 22px 0 0;padding:6px 0 0;
+    box-shadow:0 -8px 40px rgba(0,0,0,.2)}
+  @media(min-width:700px){.sheet{border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.25)}}
+  .sheet h3{font-size:19px;font-weight:700;letter-spacing:-.015em;margin:0;padding:16px 24px 4px}
+  .sheet .sb{padding:12px 24px 6px;display:grid;gap:12px}
+  .sheet .sf{display:flex;gap:10px;justify-content:flex-end;padding:14px 24px 20px}
+  .sheet textarea,.sheet select{width:100%;font-family:inherit;font-size:15px;padding:10px 12px;
+    border:1px solid var(--hair);border-radius:12px;background:#FAFAFC}
+  .sheet textarea{min-height:96px;resize:vertical}
+  .sheet .fld label{display:block;font-size:12.5px;color:var(--sub);margin-bottom:4px}
+  .choice{display:grid;gap:8px}
+  .choice button{border:1px solid var(--hair);background:#fff;border-radius:14px;padding:13px 16px;
+    text-align:left;font-size:15px;font-weight:600;transition:all .12s}
+  .choice button:hover{border-color:var(--blue);background:rgba(0,113,227,.05)}
+  .choice button small{display:block;font-weight:400;color:var(--sub);font-size:12.5px;margin-top:1px}
+
+  #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:rgba(29,29,31,.92);
+    color:#fff;padding:11px 22px;border-radius:980px;font-size:14px;font-weight:500;display:none;z-index:30;
+    backdrop-filter:blur(10px)}
+  @media(max-width:980px){.grid{grid-template-columns:1fr}.list{max-height:340px}}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="brand">SOX Review <span>· AI Solutions</span></div>
+  <div style="display:flex;gap:8px">
+    <button class="pillbtn quiet" onclick="toast('List refreshed.')">Refresh</button>
+    <button class="pillbtn" onclick="toast('New-solution form opens here (Form1, new mode).')">New Solution</button>
+  </div>
+</div>
+
+<div class="shell">
+  <h1 class="headline">AI Solution SOX Review</h1>
+  <p class="subline">Internal Audit tracker for SOX scoping of AI solutions across NRG.</p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="grid">
+    <!-- LEFT -->
+    <div class="card">
+      <h2>Solutions</h2>
+      <div class="seg" id="seg">
+        <button class="on" data-f="open" onclick="setFilter('open',this)">Open</button>
+        <button data-f="overdue" onclick="setFilter('overdue',this)">Overdue</button>
+        <button data-f="all" onclick="setFilter('all',this)">All</button>
+      </div>
+      <div class="list" id="list"></div>
+    </div>
+
+    <!-- RIGHT -->
+    <div style="display:grid;gap:22px">
+      <div class="card">
+        <h2>Open solutions by stage</h2>
+        <div class="donutwrap">
+          <svg id="donut" width="170" height="170" viewBox="0 0 170 170" role="img" aria-label="Open solutions by stage"></svg>
+          <div class="legend" id="legend"></div>
+        </div>
+      </div>
+
+      <div class="card detail" id="detailCard">
+        <div id="detailInner"><div class="empty">Select a solution to see its review record.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- conclusion choices -->
+<div class="overlay" id="m-conclusion"><div class="sheet">
+  <h3>Record IA/SOX conclusion</h3>
+  <div class="sb choice">
+    <button onclick="pickConclusion('Approve Not in Scope','Not in Scope')">Not in Scope<small>No ICFR impact identified</small></button>
+    <button onclick="pickConclusion('Approve In Scope - Low','In Scope – Low Impact')">In Scope – Low<small>ICFR-relevant, low control impact</small></button>
+    <button onclick="pickConclusion('Approve In Scope - Moderate','In Scope – Moderate Impact')">In Scope – Moderate<small>Control design changes likely</small></button>
+    <button onclick="pickConclusion('Approve In Scope - High','In Scope – High Impact')">In Scope – High<small>Key-control impact; readiness review required</small></button>
+  </div>
+  <div class="sf"><button class="pillbtn quiet" onclick="closeSheets()">Cancel</button></div>
+</div></div>
+
+<!-- confirm -->
+<div class="overlay" id="m-confirm"><div class="sheet">
+  <h3>Confirm conclusion</h3>
+  <div class="sb"><p style="margin:0;color:var(--sub)">Submit <strong id="confLabel" style="color:var(--ink)"></strong> for <strong id="confTitle" style="color:var(--ink)"></strong>? This writes the review action and hands off to the workflow.</p></div>
+  <div class="sf">
+    <button class="pillbtn quiet" onclick="backToChoices()">Back</button>
+    <button class="pillbtn" onclick="confirmConclusion()">Confirm</button>
+  </div>
+</div></div>
+
+<!-- info request -->
+<div class="overlay" id="m-info"><div class="sheet">
+  <h3>Request more information</h3>
+  <div class="sb"><div class="fld"><label>Open questions for the Business / Data &amp; AI owners</label>
+    <textarea id="infoText" placeholder="What's needed to complete IA validation?"></textarea></div></div>
+  <div class="sf">
+    <button class="pillbtn quiet" onclick="closeSheets()">Cancel</button>
+    <button class="pillbtn" onclick="sendInfoRequest()">Send request</button>
+  </div>
+</div></div>
+
+<!-- readiness -->
+<div class="overlay" id="m-readiness"><div class="sheet">
+  <h3>IT readiness assessment</h3>
+  <div class="sb">
+    <div class="fld"><label>ITGC review required</label><select id="ddITGC"><option>Yes</option><option>No</option><option>TBD</option></select></div>
+    <div class="fld"><label>Control design update required</label><select id="ddCtl"><option>Yes</option><option>No</option><option>TBD</option></select></div>
+    <div class="fld"><label>External audit notification required</label><select id="ddExt"><option>Yes</option><option>No</option><option>TBD</option></select></div>
+    <div class="fld"><label>Post-deployment monitoring required</label><select id="ddPdm"><option>Yes</option><option>No</option><option>TBD</option></select></div>
+    <div class="fld"><label>IT readiness review notes</label><textarea id="readNotes"></textarea></div>
+  </div>
+  <div class="sf">
+    <button class="pillbtn quiet" onclick="closeSheets()">Close</button>
+    <button class="pillbtn quiet" onclick="saveReadiness(false)">Save assessment</button>
+    <button class="pillbtn" onclick="saveReadiness(true)">Complete review</button>
+  </div>
+</div></div>
+
+<div id="toast" role="status"></div>
+
+<script>
+/* ===== real vocabulary from the list ===== */
+const STAGES=["Intake","IA Triage","IA Validation","IA/SOX Review","Conclusion / Readiness","Closed"];
+const STAGE_OF={"New SOX Flag Received":"Intake","IA Triage Needed":"IA Triage","IA Triage in Progress":"IA Triage",
+"IA Validation in Progress":"IA Validation","Pending Business / Data & AI Input":"IA Validation",
+"Draft Conclusion Prepared":"IA/SOX Review","Pending IA/SOX Review":"IA/SOX Review",
+"Final Conclusion Issued, Not in Scope":"Conclusion / Readiness","Final Conclusion Issued, In Scope":"Conclusion / Readiness",
+"Post-Deployment Monitoring":"Conclusion / Readiness","Closed":"Closed"};
+const NEXT_ACTION={"New SOX Flag Received":"Mark Triage Complete","IA Triage Needed":"Mark Triage Complete",
+"IA Triage in Progress":"Mark Triage Complete","IA Validation in Progress":"Submit for IA/SOX Review",
+"Draft Conclusion Prepared":"Submit for IA/SOX Review","Final Conclusion Issued, Not in Scope":"Mark Closed",
+"Final Conclusion Issued, In Scope":"Mark Closed","Post-Deployment Monitoring":"Mark Closed",
+"Pending Business / Data & AI Input":"Resume IA Validation"};
+const MOCK_NEXT={"New SOX Flag Received":"IA Triage in Progress","IA Triage Needed":"IA Triage in Progress",
+"IA Triage in Progress":"IA Validation in Progress","IA Validation in Progress":"Pending IA/SOX Review",
+"Draft Conclusion Prepared":"Pending IA/SOX Review","Pending Business / Data & AI Input":"IA Validation in Progress",
+"Final Conclusion Issued, Not in Scope":"Closed","Final Conclusion Issued, In Scope":"Post-Deployment Monitoring",
+"Post-Deployment Monitoring":"Closed"};
+const COLORS={"Intake":"#0071E3","IA Triage":"#FF9500","IA Validation":"#30B0C7","IA/SOX Review":"#AF52DE","Conclusion / Readiness":"#34C759","Closed":"#8E8E93"};
+const BCLASS={"Intake":"b-intake","IA Triage":"b-triage","IA Validation":"b-valid","IA/SOX Review":"b-review","Conclusion / Readiness":"b-concl","Closed":"b-closed"};
+const TODAY="2026-09-09";
+
+/* ===== sample records using the tracker's real column set ===== */
+let items=[
+ {Id:14,Title:"Invoice Coding Copilot",
+  AISolutionSummary:"GenAI assistant that suggests GL account coding for AP invoices prior to posting in SAP. Suggestions are approved by an AP analyst before posting.",
+  SubmissionDate:"2026-08-12",GoLiveDate:"2026-11-01",CurrentStatus:"Pending IA/SOX Review",NextActionDueDate:"2026-09-12",
+  CurrentOwner:"D. Whitfield",IAReviewer:"M. Okafor",IASOXApprover:"K. Patel",BusinessOwner:"AP Shared Services",
+  DataAIOwner:"Enterprise Data & AI",ApplicationTechnicalOwner:"SAP CoE",
+  AgentPreliminaryRecommendation:"Likely In Scope",FlagTrigger:"Writes/posts to financial system",
+  AgentSOXRationale:"Solution influences journal-relevant coding in SAP; output feeds a key AP posting control (AP-04).",
+  PotentialSOXProcess:"Procure to Pay",PotentialSOXSystems:"SAP ECC",PotentialControlImpact:"AP-04 invoice coding review",
+  WritesOrPostsData:"Yes",HumanReviewRequired:"Yes",NewSystemAPIInterfaceRPA:"Yes",
+  IAReviewStartDate:"2026-08-20",IADraftConclusion:"In Scope",ICFRImpactClassification:"Moderate",
+  ConclusionRationale:"",ReminderCount:1,OpenQuestions:"Confirm whether analyst approval is enforced or advisory.",
+  EvidenceFolderLink:"#"},
+ {Id:9,Title:"Plant Outage Forecast Model",
+  AISolutionSummary:"ML model forecasting unplanned generation outages. Output is consumed only by operational planning dashboards.",
+  SubmissionDate:"2026-08-18",GoLiveDate:"2026-10-05",CurrentStatus:"IA Validation in Progress",NextActionDueDate:"2026-09-10",
+  CurrentOwner:"R. Salinas",IAReviewer:"M. Okafor",IASOXApprover:"",BusinessOwner:"Plant Operations",
+  DataAIOwner:"Enterprise Data & AI",ApplicationTechnicalOwner:"Generation IT",
+  AgentPreliminaryRecommendation:"Likely Not in Scope",FlagTrigger:"New model on production data",
+  AgentSOXRationale:"No financial-reporting data produced or consumed; operational planning only.",
+  PotentialSOXProcess:"None identified",PotentialSOXSystems:"None identified",PotentialControlImpact:"None identified",
+  WritesOrPostsData:"No",HumanReviewRequired:"Yes",NewSystemAPIInterfaceRPA:"No",
+  IAReviewStartDate:"2026-08-28",IADraftConclusion:"",ICFRImpactClassification:"",ConclusionRationale:"",
+  ReminderCount:0,OpenQuestions:"",EvidenceFolderLink:"#"},
+ {Id:21,Title:"Contract Clause Extractor",
+  AISolutionSummary:"NLP extraction of key commercial terms from executed PPAs into the contract repository for downstream settlement setup.",
+  SubmissionDate:"2026-09-05",GoLiveDate:"2026-12-15",CurrentStatus:"New SOX Flag Received",NextActionDueDate:"2026-09-08",
+  CurrentOwner:"",IAReviewer:"",IASOXApprover:"",BusinessOwner:"Commercial Operations",
+  DataAIOwner:"Enterprise Data & AI",ApplicationTechnicalOwner:"Trading IT",
+  AgentPreliminaryRecommendation:"Needs Triage",FlagTrigger:"Feeds settlement-relevant master data",
+  AgentSOXRationale:"Extracted terms may seed settlement calculations; scoping depends on downstream validation controls.",
+  PotentialSOXProcess:"Revenue / Settlements",PotentialSOXSystems:"Allegro",PotentialControlImpact:"TBD",
+  WritesOrPostsData:"Yes",HumanReviewRequired:"TBD",NewSystemAPIInterfaceRPA:"Yes",
+  IAReviewStartDate:"",IADraftConclusion:"",ICFRImpactClassification:"",ConclusionRationale:"",
+  ReminderCount:2,OpenQuestions:"",EvidenceFolderLink:"#"},
+ {Id:17,Title:"Retail Churn Scoring",
+  AISolutionSummary:"Customer churn propensity scores consumed by campaign tooling in Retail Marketing.",
+  SubmissionDate:"2026-07-30",GoLiveDate:"2026-09-20",CurrentStatus:"Pending Business / Data & AI Input",NextActionDueDate:"2026-09-16",
+  CurrentOwner:"T. Nguyen",IAReviewer:"J. Barrera",IASOXApprover:"",BusinessOwner:"Retail Marketing",
+  DataAIOwner:"Enterprise Data & AI",ApplicationTechnicalOwner:"Retail IT",
+  AgentPreliminaryRecommendation:"Likely Not in Scope",FlagTrigger:"New model on customer data",
+  AgentSOXRationale:"Marketing use only; no ICFR data path identified.",
+  PotentialSOXProcess:"None identified",PotentialSOXSystems:"None identified",PotentialControlImpact:"None identified",
+  WritesOrPostsData:"No",HumanReviewRequired:"No",NewSystemAPIInterfaceRPA:"No",
+  IAReviewStartDate:"2026-08-14",IADraftConclusion:"Not in Scope",ICFRImpactClassification:"None",
+  ConclusionRationale:"",ReminderCount:1,
+  OpenQuestions:"Confirm scores never feed revenue recognition or billing adjustments.",
+  ReviewActionNotes:"Awaiting confirmation that campaign tool cannot trigger billing credits.",EvidenceFolderLink:"#"},
+ {Id:12,Title:"Fuel Settlement Anomaly Agent",
+  AISolutionSummary:"Agent flags anomalies in fuel settlement statements and drafts adjustment entries for accountant review.",
+  SubmissionDate:"2026-06-10",GoLiveDate:"2026-08-01",CurrentStatus:"Final Conclusion Issued, In Scope",NextActionDueDate:"2026-09-22",
+  CurrentOwner:"D. Whitfield",IAReviewer:"J. Barrera",IASOXApprover:"K. Patel",BusinessOwner:"Fuel Accounting",
+  DataAIOwner:"Enterprise Data & AI",ApplicationTechnicalOwner:"SAP CoE",
+  AgentPreliminaryRecommendation:"Likely In Scope",FlagTrigger:"Drafts journal-relevant entries",
+  AgentSOXRationale:"Drafted adjustments enter the journal approval path; key control FS-07 relies on completeness of flags.",
+  PotentialSOXProcess:"Fuel / Cost of Sales",PotentialSOXSystems:"SAP ECC, Allegro",PotentialControlImpact:"FS-07 settlement review",
+  WritesOrPostsData:"Yes",HumanReviewRequired:"Yes",NewSystemAPIInterfaceRPA:"Yes",
+  IAReviewStartDate:"2026-06-24",IADraftConclusion:"In Scope",IAFinalConclusion:"In Scope",
+  ICFRImpactClassification:"High",ApprovalDate:"2026-08-28",
+  ConclusionRationale:"In scope: agent output is an input to key control FS-07. Readiness review required before reliance.",
+  ReminderCount:0,OpenQuestions:"",EvidenceFolderLink:"#"},
+ {Id:8,Title:"HR Policy Chatbot",
+  AISolutionSummary:"Internal chatbot answering HR policy questions from the employee handbook.",
+  SubmissionDate:"2026-05-02",GoLiveDate:"2026-06-15",CurrentStatus:"Closed",NextActionDueDate:"2026-08-30",
+  CurrentOwner:"",IAReviewer:"M. Okafor",IASOXApprover:"K. Patel",BusinessOwner:"Human Resources",
+  DataAIOwner:"Enterprise Data & AI",ApplicationTechnicalOwner:"Workplace IT",
+  AgentPreliminaryRecommendation:"Not in Scope",FlagTrigger:"Routine intake",
+  AgentSOXRationale:"No financial data, systems, or controls touched.",
+  PotentialSOXProcess:"None",PotentialSOXSystems:"None",PotentialControlImpact:"None",
+  WritesOrPostsData:"No",HumanReviewRequired:"No",NewSystemAPIInterfaceRPA:"No",
+  IAReviewStartDate:"2026-05-10",IADraftConclusion:"Not in Scope",IAFinalConclusion:"Not in Scope",
+  ICFRImpactClassification:"None",ApprovalDate:"2026-06-02",ClosedDate:"2026-06-05",
+  ConclusionRationale:"Not in scope; no ICFR relevance.",ReminderCount:0,OpenQuestions:"",EvidenceFolderLink:"#"}
+];
+let selectedId=null,filter="open",pendingAction=null,pendingLabel=null;
+const $=id=>document.getElementById(id);
+
+function visible(){
+  let v=[...items];
+  if(filter==="open")v=v.filter(i=>i.CurrentStatus!=="Closed");
+  if(filter==="overdue")v=v.filter(i=>i.CurrentStatus!=="Closed"&&i.NextActionDueDate<TODAY);
+  return v.sort((a,b)=>a.NextActionDueDate.localeCompare(b.NextActionDueDate));
+}
+function render(){
+  const open=items.filter(i=>i.CurrentStatus!=="Closed");
+  const overdue=open.filter(i=>i.NextActionDueDate<TODAY);
+  $("stats").innerHTML=
+    stat(open.length,"Open solutions","blue")+
+    stat(overdue.length,"Overdue actions",overdue.length?"red":"")+
+    stat(open.filter(i=>i.CurrentStatus==="Pending IA/SOX Review").length,"Awaiting IA/SOX conclusion","")+
+    stat(items.filter(i=>i.ICFRImpactClassification==="High").length,"High ICFR impact","")+
+    stat(items.filter(i=>i.CurrentStatus==="Closed").length,"Closed","green");
+  $("list").innerHTML=visible().map(i=>{
+    const st=STAGE_OF[i.CurrentStatus],over=i.NextActionDueDate<TODAY&&i.CurrentStatus!=="Closed";
+    return `<div class="row ${i.Id===selectedId?'sel':''}" onclick="select(${i.Id})">
+      <div class="t">${i.Title}</div>
+      <div class="m"><span class="badge ${BCLASS[st]}">${i.CurrentStatus}</span>
+      <span class="due ${over?'over':''}">${over?'Overdue · ':''}${i.NextActionDueDate}</span></div></div>`;
+  }).join("")||`<div class="empty">Nothing here.</div>`;
+  renderDonut(open); renderDetail();
+}
+const stat=(n,l,c)=>`<div class="stat ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+
+function renderDonut(open){
+  const counts={};open.forEach(i=>{const s=STAGE_OF[i.CurrentStatus];counts[s]=(counts[s]||0)+1;});
+  const entries=STAGES.filter(s=>counts[s]).map(s=>[s,counts[s]]);
+  const total=open.length||1;let a0=-Math.PI/2,svg="";
+  const R=70,W=20,C=85;
+  entries.forEach(([s,n])=>{
+    const a1=a0+2*Math.PI*n/total,large=(a1-a0)>Math.PI?1:0;
+    if(entries.length===1){svg+=`<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${COLORS[s]}" stroke-width="${W}"/>`;}
+    else{const x0=C+R*Math.cos(a0),y0=C+R*Math.sin(a0),x1=C+R*Math.cos(a1),y1=C+R*Math.sin(a1);
+      svg+=`<path d="M${x0},${y0} A${R},${R} 0 ${large} 1 ${x1},${y1}" fill="none" stroke="${COLORS[s]}" stroke-width="${W}" stroke-linecap="butt"/>`;}
+    a0=a1+0.02;
+  });
+  svg+=`<text x="${C}" y="${C-2}" text-anchor="middle" font-size="26" font-weight="700" fill="#1D1D1F">${open.length}</text>
+        <text x="${C}" y="${C+18}" text-anchor="middle" font-size="11" fill="#6E6E73">open</text>`;
+  $("donut").innerHTML=svg;
+  $("legend").innerHTML=entries.map(([s,n])=>
+    `<div class="li"><span class="dot" style="background:${COLORS[s]}"></span>${s}<strong>${n}</strong></div>`).join("");
+}
+
+function yn(v){return v==="Yes"?`<span class="yes">Yes</span>`:v==="No"?`<span class="no">No</span>`:v?`<span class="tbd">${v}</span>`:"—";}
+function f(l,v,wide){return `<div class="f ${wide?'wide':''}"><label>${l}</label><div class="v ${wide?'long':''}">${v||"—"}</div></div>`;}
+
+function renderDetail(){
+  const i=items.find(x=>x.Id===selectedId);
+  if(!i){$("detailInner").innerHTML='<div class="empty">Select a solution to see its review record.</div>';return;}
+  const st=STAGE_OF[i.CurrentStatus];
+  const stageIdx=STAGES.indexOf(st);
+  const journey=`<div class="journey">`+STAGES.map((s,ix)=>{
+    const cls=ix<stageIdx?"done":ix===stageIdx?"on":"";
+    return `<div class="jstep ${cls}"><div class="jdot">${ix<stageIdx?"✓":ix+1}</div><span class="jlbl">${s}</span>${ix<5?'<div class="jline"></div>':''}</div>`;
+  }).join("")+`</div>`;
+  const na=i.CurrentStatus==="Pending IA/SOX Review"?"Record Conclusion":NEXT_ACTION[i.CurrentStatus];
+  $("detailInner").innerHTML=`
+   <div class="head">
+     <h3>${i.Title}</h3><p>${i.AISolutionSummary}</p>
+     <div class="headrow">
+       <span class="badge ${BCLASS[st]}">${i.CurrentStatus}</span>
+       <span style="color:var(--sub);font-size:13px">Next action due <strong style="color:${i.NextActionDueDate<TODAY&&i.CurrentStatus!=='Closed'?'var(--red)':'var(--ink)'}">${i.NextActionDueDate}</strong></span>
+       ${i.ReminderCount?`<span style="color:var(--sub);font-size:13px">· ${i.ReminderCount} reminder${i.ReminderCount>1?'s':''} sent</span>`:''}
+     </div>
+   </div>
+   ${journey}
+   <div class="body">
+     <div class="sect"><h4>Agent assessment</h4><div class="fgrid">
+       ${f("Preliminary recommendation",i.AgentPreliminaryRecommendation)}
+       ${f("Flag trigger",i.FlagTrigger)}
+       ${f("SOX rationale",i.AgentSOXRationale,true)}
+     </div></div>
+     <div class="sect"><h4>Potential SOX footprint</h4><div class="fgrid">
+       ${f("Process",i.PotentialSOXProcess)}${f("Systems",i.PotentialSOXSystems)}
+       ${f("Control impact",i.PotentialControlImpact)}
+       ${f("Writes or posts data",yn(i.WritesOrPostsData))}
+       ${f("Human review required",yn(i.HumanReviewRequired))}
+       ${f("New system / API / RPA",yn(i.NewSystemAPIInterfaceRPA))}
+     </div></div>
+     <div class="sect"><h4>Ownership</h4><div class="fgrid">
+       ${f("Business owner",i.BusinessOwner)}${f("Data & AI owner",i.DataAIOwner)}
+       ${f("Technical owner",i.ApplicationTechnicalOwner)}${f("Current owner",i.CurrentOwner)}
+       ${f("Submitted",i.SubmissionDate)}${f("Planned go-live",i.GoLiveDate)}
+     </div></div>
+     <div class="sect"><h4>IA review</h4><div class="fgrid">
+       ${f("IA reviewer",i.IAReviewer)}${f("Review started",i.IAReviewStartDate)}
+       ${f("Draft conclusion",i.IADraftConclusion)}${f("Final conclusion",i.IAFinalConclusion)}
+       ${f("ICFR impact",i.ICFRImpactClassification)}${f("IA/SOX approver",i.IASOXApprover)}
+       ${i.ApprovalDate?f("Approved",i.ApprovalDate):""}${i.ClosedDate?f("Closed",i.ClosedDate):""}
+       ${i.ConclusionRationale?f("Conclusion rationale",i.ConclusionRationale,true):""}
+       ${i.OpenQuestions?f("Open questions",i.OpenQuestions,true):""}
+       ${i.ReviewActionNotes?f("Latest review action notes",i.ReviewActionNotes,true):""}
+     </div></div>
+     <div class="sect"><h4>Evidence</h4><div class="fgrid">
+       ${f("Evidence folder",`<a href="${i.EvidenceFolderLink}" style="color:var(--blue);text-decoration:none">Open folder ↗</a>`)}
+     </div></div>
+   </div>
+   <div class="actionsbar">
+     <button class="pillbtn" id="btnNext" onclick="nextStep()" ${na?"":"disabled"}>${na?("Next: "+na):"No next step"}</button>
+     <button class="pillbtn quiet" onclick="openSheet('info')">Request information</button>
+     <button class="pillbtn quiet" onclick="openSheet('readiness')">IT readiness</button>
+   </div>`;
+}
+function select(id){selectedId=id;render();}
+function setFilter(fk,btn){filter=fk;document.querySelectorAll("#seg button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");render();}
+
+/* ===== write paths (mock of §3) ===== */
+function nextStep(){
+  const i=items.find(x=>x.Id===selectedId);if(!i)return;
+  if(i.CurrentStatus==="Pending IA/SOX Review"){openSheet("conclusion");return;}
+  const action=NEXT_ACTION[i.CurrentStatus];if(!action)return;
+  i.ReviewAction=action;                      /* real app: only this column is written */
+  i.CurrentStatus=MOCK_NEXT[i.CurrentStatus]||i.CurrentStatus;  /* flow-simulated */
+  toast("Next workflow action submitted.");render();
+}
+function pickConclusion(action,label){pendingAction=action;pendingLabel=label;
+  $("confLabel").textContent=label;$("confTitle").textContent=items.find(x=>x.Id===selectedId)?.Title||"";
+  closeSheets();$("m-confirm").classList.add("open");}
+function backToChoices(){closeSheets();$("m-conclusion").classList.add("open");}
+function confirmConclusion(){
+  const i=items.find(x=>x.Id===selectedId);
+  i.ReviewAction=pendingAction;
+  i.IAFinalConclusion=pendingAction==="Approve Not in Scope"?"Not in Scope":"In Scope";
+  i.ICFRImpactClassification=pendingAction.endsWith("High")?"High":pendingAction.endsWith("Moderate")?"Moderate":pendingAction.endsWith("Low")?"Low":"None";
+  i.CurrentStatus=pendingAction==="Approve Not in Scope"?"Final Conclusion Issued, Not in Scope":"Final Conclusion Issued, In Scope";
+  closeSheets();toast(pendingLabel+" submitted.");render();}
+function sendInfoRequest(){
+  const i=items.find(x=>x.Id===selectedId);
+  i.ReviewActionNotes=$("infoText").value.trim();i.ReviewAction="Request More Information";
+  i.CurrentStatus="Pending Business / Data & AI Input";$("infoText").value="";
+  closeSheets();toast("Information request submitted.");render();}
+function saveReadiness(complete){
+  const i=items.find(x=>x.Id===selectedId);
+  i.ITGCReviewRequired=$("ddITGC").value;i.ControlDesignUpdateRequired=$("ddCtl").value;
+  i.ExternalAuditNotificationRequire=$("ddExt").value;i.PostDeploymentMonitoringRequired=$("ddPdm").value;
+  i.ITReadinessReviewNotes=$("readNotes").value.trim();
+  if(complete)i.ReviewAction="Complete Readiness Review";
+  closeSheets();toast(complete?"Readiness review completed.":"Assessment saved.");render();}
+
+/* ===== sheet & toast plumbing ===== */
+function openSheet(k){if(selectedId==null){toast("Select a solution first.");return;}closeSheets();$("m-"+k).classList.add("open");}
+function closeSheets(){document.querySelectorAll(".overlay").forEach(o=>o.classList.remove("open"));}
+document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)closeSheets();}));
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(tt);tt=setTimeout(()=>t.style.display="none",2400);}
+render();
+</script>
+</body>
+</html>
